@@ -427,17 +427,9 @@ async def test_xpath(slug: str, test_xpath: str):
     }
 
 
-@app.get("/")
-async def root():
-    """Root endpoint that Railway health check can access"""
-    return {
-        "message": "ScrapeToAPI is running!", 
-        "status": "healthy",
-        "docs_url": "/docs" if os.getenv("DEBUG") else "Docs disabled in production"
-    }
 
 # Make sure your home page route comes after the root API endpoint
-@app.get("/app", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Serve the main page with URL input form"""
     return templates.TemplateResponse("index.html", {"request": request})
