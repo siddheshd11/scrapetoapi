@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScrapeToAPI</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 ScrapeToAPI</h1>
+        <p>Convert any webpage into a JSON API instantly</p>
+        
+        <form id="scrapeForm" class="scrape-form">
+            <div class="input-group">
+                <input 
+                    type="url" 
+                    id="urlInput" 
+                    name="url" 
+                    placeholder="https://example.com" 
+                    required
+                >
+                <button type="submit" id="scrapeBtn">
+                    <span id="btnText">Scrape URL</span>
+                    <span id="btnSpinner" class="spinner hidden">⏳</span>
+                </button>
+            </div>
+        </form>
+
+        <div id="result" class="result hidden">
+            <h3>✅ API Generated Successfully!</h3>
+            <div class="api-info">
+                <label>Your API Endpoint:</label>
+                <div class="api-endpoint">
+                    <input type="text" id="apiUrl" readonly>
+                    <button onclick="copyToClipboard()" class="copy-btn">Copy</button>
+                </div>
+            </div>
+            
+            <div class="api-usage">
+                <h4>📚 API Usage Examples</h4>
+                
+                <div class="usage-section">
+                    <h5>1. Get Complete Data</h5>
+                    <div class="code-block">
+                        <code id="completeApiExample">GET YOUR_API_URL</code>
+                        <button onclick="copyCode('completeApiExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Returns the full DOM structure with all elements, attributes, and XPaths.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>2. Get All Links</h5>
+                    <div class="code-block">
+                        <code id="linksApiExample">GET YOUR_API_URL/links</code>
+                        <button onclick="copyCode('linksApiExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Returns all links found on the page with their text, URLs, and XPath locations.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>3. Get All Images</h5>
+                    <div class="code-block">
+                        <code id="imagesApiExample">GET YOUR_API_URL/images</code>
+                        <button onclick="copyCode('imagesApiExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Returns all images with src URLs, alt text, and XPath locations.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>4. Get Headings (H1-H6)</h5>
+                    <div class="code-block">
+                        <code id="headingsApiExample">GET YOUR_API_URL/headings</code>
+                        <button onclick="copyCode('headingsApiExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Returns all headings with their text content, level, and XPath.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>5. Filter by XPath</h5>
+                    <div class="code-block">
+                        <code id="xpathFilterExample">GET YOUR_API_URL/filter/xpath?xpath=/body[1]/div[1]</code>
+                        <button onclick="copyCode('xpathFilterExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Get elements by their exact XPath location in the DOM tree. Use the browse endpoint to find available XPaths.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>6. Browse DOM Structure</h5>
+                    <div class="code-block">
+                        <code id="browseExample">GET YOUR_API_URL/browse</code>
+                        <button onclick="copyCode('browseExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Browse the complete DOM structure to see all available XPaths and element details.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>7. Filter by HTML Tag</h5>
+                    <div class="code-block">
+                        <code id="tagFilterExample">GET YOUR_API_URL/filter/tag/div</code>
+                        <button onclick="copyCode('tagFilterExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                    <p>Get all elements of a specific HTML tag (div, p, span, etc.). Replace 'div' with any tag.</p>
+                </div>
+
+                <div class="usage-section">
+                    <h5>8. JavaScript/Python Usage</h5>
+                    <div class="code-block">
+<pre><code id="jsExample">// JavaScript - Get links
+fetch('YOUR_API_URL/links')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// JavaScript - Filter by XPath
+fetch('YOUR_API_URL/filter/xpath?xpath=/body[1]/div[1]')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+# Python - Get images
+import requests
+response = requests.get('YOUR_API_URL/images')
+data = response.json()
+
+# Python - Filter by XPath
+import requests
+response = requests.get('YOUR_API_URL/filter/xpath?xpath=/body[1]/div[1]')
+data = response.json()</code></pre>
+                        <button onclick="copyCode('jsExample')" class="copy-code-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button onclick="testAPI()" class="test-btn">Test Complete API</button>
+                <button onclick="browseStructure()" class="test-btn">Browse Structure</button>
+                <button onclick="testXPath()" class="test-btn">Test XPath Filter</button>
+                <button onclick="reset()" class="reset-btn">Scrape Another</button>
+            </div>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+        
+        <div class="info-section">
+            <h4>💻 Scrape Static Websites!</h4>
+            <h4>💡 What you can do with this API:</h4>
+            <ul>
+                <li><strong>Web Scraping:</strong> Extract data from any website programmatically</li>
+                <li><strong>Content Analysis:</strong> Analyze webpage structure and content</li>
+                <li><strong>Data Integration:</strong> Feed webpage data into your applications</li>
+                <li><strong>Monitoring:</strong> Track changes in website content</li>
+                <li><strong>Research:</strong> Gather data for analysis and research projects</li>
+            </ul>
+
+        </div>
+         <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🔗 ScrapeToAPI</h4>
+                    <p>Convert any webpage into a structured JSON API instantly. Built with FastAPI and Python.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h5>📚 Resources</h5>
+                    <ul>
+                        <li><a href="#" onclick="showDocumentation()">API Documentation</a></li>
+                        <li><a href="#" onclick="showExamples()">Usage Examples</a></li>
+                        <li><a href="#" onclick="showLimitations()">Limitations & Ethics</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h5>⚡ Connect</h5>
+                    <ul>
+                        <li><a href="https://tally.so/r/mR9bgv" target="_blank">Want a custom scrapper?</a></li>
+                        <li><a href="https://buymeacoffee.com/siddheshd17" target="_blank">Buy Me Coffee</a></li>
+                        <li><a href="mailto:siddheshd11@gmail.com" target="_blank">Email Me</a></li>
+                        
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 ScrapeToAPI. Built for developers, by developers. 
+                   <span class="footer-note">Please respect robots.txt and website terms of service.</span>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const form = document.getElementById('scrapeForm');
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const scrapeBtn = document.getElementById('scrapeBtn');
+
+        let currentApiUrl = '';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = document.getElementById('urlInput').value;
+            console.log('Submitting form with URL:', url);
+            
+            // Show loading state
+            btnText.textContent = 'Scraping...';
+            btnSpinner.classList.remove('hidden');
+            scrapeBtn.disabled = true;
+            error.classList.add('hidden');
+            result.classList.add('hidden');
+            
+            // Add progress dots
+            let dots = 0;
+            const progressInterval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                btnText.textContent = 'Scraping' + '.'.repeat(dots);
+            }, 500);
+            
+            try {
+                const formData = new FormData();
+                formData.append('url', url);
+                
+                console.log('Sending request to /scrape');
+                
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    // Show result
+                    const fullApiUrl = window.location.origin + data.api_endpoint;
+                    currentApiUrl = fullApiUrl;
+                    document.getElementById('apiUrl').value = fullApiUrl;
+                    
+                    console.log('API URL generated:', fullApiUrl);
+                    
+                    // Update all API examples
+                    document.getElementById('completeApiExample').textContent = `GET ${fullApiUrl}`;
+                    document.getElementById('linksApiExample').textContent = `GET ${fullApiUrl}/links`;
+                    document.getElementById('imagesApiExample').textContent = `GET ${fullApiUrl}/images`;
+                    document.getElementById('headingsApiExample').textContent = `GET ${fullApiUrl}/headings`;
+                    document.getElementById('xpathFilterExample').textContent = `GET ${fullApiUrl}/filter/xpath?xpath=/body[1]/div[1]`;
+                    document.getElementById('browseExample').textContent = `GET ${fullApiUrl}/browse`;
+                    document.getElementById('tagFilterExample').textContent = `GET ${fullApiUrl}/filter/tag/div`;
+                    
+                    // Update JavaScript example
+                    const jsExample = document.getElementById('jsExample');
+                    jsExample.innerHTML = `// JavaScript - Get links
+fetch('${fullApiUrl}/links')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// JavaScript - Filter by XPath
+fetch('${fullApiUrl}/filter/xpath?xpath=/body[1]/div[1]')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+# Python - Get images
+import requests
+response = requests.get('${fullApiUrl}/images')
+data = response.json()
+
+# Python - Filter by XPath
+import requests
+response = requests.get('${fullApiUrl}/filter/xpath?xpath=/body[1]/div[1]')
+data = response.json()`;
+                    
+                    result.classList.remove('hidden');
+                    console.log('Result displayed successfully');
+                } else {
+                    throw new Error(data.message || 'Scraping failed');
+                }
+                
+            } catch (err) {
+                console.error('Error during scraping:', err);
+                error.textContent = 'Error: ' + err.message;
+                error.classList.remove('hidden');
+            } finally {
+                clearInterval(progressInterval);
+                btnText.textContent = 'Scrape URL';
+                btnSpinner.classList.add('hidden');
+                scrapeBtn.disabled = false;
+            }
+        });
+
+        function copyToClipboard() {
+            const apiUrl = document.getElementById('apiUrl');
+            apiUrl.select();
+            apiUrl.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                document.execCommand('copy');
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+            }
+        }
+
+        function copyCode(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = element.parentElement.querySelector('.copy-code-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const btn = element.parentElement.querySelector('.copy-code-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                } catch (err) {
+                    console.error('Fallback copy failed: ', err);
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        async function testAPI() {
+            if (!currentApiUrl) {
+                alert('Please scrape a URL first!');
+                return;
+            }
+            
+            try {
+                console.log('Testing API:', currentApiUrl);
+                const response = await fetch(currentApiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Open the JSON data in a new window/tab
+                const jsonWindow = window.open('', '_blank');
+                jsonWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>API Response - Complete Data</title>
+                            <style>
+                                body { 
+                                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+                                    padding: 20px; 
+                                    background: #f5f5f5; 
+                                }
+                                pre { 
+                                    background: white; 
+                                    padding: 20px; 
+                                    border-radius: 8px; 
+                                    overflow: auto; 
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    font-size: 12px;
+                                    line-height: 1.4;
+                                }
+                                h2 { color: #333; }
+                            </style>
+                        </head>
+                        <body>
+                            <h2>Complete API Response</h2>
+                            <p><strong>URL:</strong> ${currentApiUrl}</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </body>
+                    </html>
+                `);
+            } catch (err) {
+                console.error('API test failed:', err);
+                alert('Failed to test API: ' + err.message);
+            }
+        }
+
+        async function browseStructure() {
+            if (!currentApiUrl) {
+                alert('Please scrape a URL first!');
+                return;
+            }
+            
+            try {
+                console.log('Browsing structure:', currentApiUrl + '/browse');
+                const response = await fetch(currentApiUrl + '/browse');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                const jsonWindow = window.open('', '_blank');
+                jsonWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>DOM Structure Browser</title>
+                            <style>
+                                body { 
+                                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+                                    padding: 20px; 
+                                    background: #f5f5f5;
+                                }
+                                .element { 
+                                    margin: 8px 0; 
+                                    padding: 15px; 
+                                    border-left: 4px solid #007bff; 
+                                    background: white; 
+                                    border-radius: 6px;
+                                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                }
+                                .xpath { 
+                                    color: #007bff; 
+                                    font-weight: bold; 
+                                    font-family: 'Courier New', monospace;
+                                    cursor: pointer;
+                                    text-decoration: underline;
+                                    font-size: 13px;
+                                }
+                                .xpath:hover { 
+                                    color: #0056b3; 
+                                    background: #f8f9fa;
+                                    padding: 2px 4px;
+                                    border-radius: 3px;
+                                }
+                                .tag { color: #28a745; font-weight: 500; margin: 5px 0; }
+                                .text { color: #6c757d; font-style: italic; margin: 5px 0; }
+                                .attrs { color: #6610f2; font-size: 0.9em; margin: 5px 0; }
+                                h2 { 
+                                    color: #333; 
+                                    border-bottom: 3px solid #007bff; 
+                                    padding-bottom: 10px; 
+                                    margin-bottom: 20px;
+                                }
+                                .copy-notice { 
+                                    background: #d4edda; 
+                                    padding: 10px; 
+                                    border-radius: 5px; 
+                                    margin-bottom: 20px;
+                                    border-left: 4px solid #28a745;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <h2>🌳 DOM Structure (${data.total_elements} elements)</h2>
+                            <div class="copy-notice">
+                                <strong>💡 Tip:</strong> Click on any XPath to copy it to your clipboard
+                            </div>
+                            ${data.elements.map(el => `
+                                <div class="element">
+                                    <div class="xpath" onclick="
+                                        navigator.clipboard.writeText('${el.xpath}').then(() => {
+                                            this.style.background='#28a745'; 
+                                            this.style.color='white'; 
+                                            this.textContent = this.textContent + ' ✓ Copied!';
+                                            setTimeout(() => { 
+                                                this.style.background=''; 
+                                                this.style.color='#007bff'; 
+                                                this.textContent = '${el.xpath}';
+                                            }, 2000);
+                                        }).catch(() => {
+                                            alert('Failed to copy XPath');
+                                        });
+                                    ">${el.xpath}</div>
+                                    <div class="tag">Tag: ${el.tag || 'text'}</div>
+                                    ${el.text_preview ? `<div class="text">Text: ${el.text_preview}</div>` : ''}
+                                    ${el.children_count ? `<div>Children: ${el.children_count}</div>` : ''}
+                                    ${el.attributes && Object.keys(el.attributes).length > 0 ? `<div class="attrs">Attributes: ${JSON.stringify(el.attributes)}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </body>
+                    </html>
+                `);
+            } catch (err) {
+                console.error('Browse structure failed:', err);
+                alert('Failed to browse structure: ' + err.message);
+            }
+        }
+
+        async function testXPath() {
+            if (!currentApiUrl) {
+                alert('Please scrape a URL first!');
+                return;
+            }
+            
+            const xpath = prompt("Enter XPath (e.g., /body[1]/div[1]):");
+            if (!xpath) return;
+            
+            try {
+                const encodedXPath = encodeURIComponent(xpath);
+                const url = `${currentApiUrl}/filter/xpath?xpath=${encodedXPath}`;
+                console.log('Testing XPath:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                const jsonWindow = window.open('', '_blank');
+                jsonWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>XPath Filter Result</title>
+                            <style>
+                                body { 
+                                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+                                    padding: 20px; 
+                                    background: #f5f5f5;
+                                }
+                                pre { 
+                                    background: white; 
+                                    padding: 20px; 
+                                    border-radius: 8px; 
+                                    overflow: auto; 
+                                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    font-size: 12px;
+                                }
+                                .success { color: #28a745; font-weight: bold; }
+                                .error { color: #dc3545; font-weight: bold; }
+                                .info { 
+                                    background: white; 
+                                    padding: 15px; 
+                                    border-radius: 8px; 
+                                    margin-bottom: 20px;
+                                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                }
+                                h2 { color: #333; }
+                            </style>
+                        </head>
+                        <body>
+                            <h2>XPath Filter Result</h2>
+                            <div class="info">
+                                <p><strong>XPath:</strong> <code>${xpath}</code></p>
+                                <p class="${data.count > 0 ? 'success' : 'error'}">
+                                    <strong>Found:</strong> ${data.count} element(s)
+                                </p>
+                                <p><strong>URL:</strong> ${url}</p>
+                            </div>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </body>
+                    </html>
+                `);
+            } catch (err) {
+                console.error('XPath test failed:', err);
+                alert('Failed to filter by XPath: ' + err.message);
+            }
+        }
+
+        function reset() {
+            result.classList.add('hidden');
+            error.classList.add('hidden');
+            document.getElementById('urlInput').value = '';
+            currentApiUrl = '';
+            console.log('Form reset');
+        }
+
+        function showDocumentation() {
+            const docWindow = window.open('', '_blank');
+            docWindow.document.write(`
+                <html>
+                    <head>
+                        <title>ScrapeToAPI - Documentation</title>
+                        <style>
+                            body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+                            h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+                            h2 { color: #007bff; margin-top: 30px; }
+                            .endpoint { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #007bff; }
+                            .method { color: #28a745; font-weight: bold; }
+                            code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>📚 ScrapeToAPI Documentation</h1>
+                        
+                        <h2>🔥 Quick Start</h2>
+                        <p>1. Enter any public URL in the input box<br>
+                           2. Click "Scrape URL" to generate your API<br>
+                           3. Use the generated endpoint to access structured data</p>
+                        
+                        <h2>🌐 Available Endpoints</h2>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}</code>
+                            <p>Returns complete scraped data with DOM tree structure, metadata, and indexed content.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/links</code>
+                            <p>Returns all links found on the page with text, URLs, and XPath locations.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/images</code>
+                            <p>Returns all images with source URLs, alt text, and XPath locations.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/headings</code>
+                            <p>Returns all heading elements (H1-H6) with text content and hierarchy levels.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/text</code>
+                            <p>Returns all meaningful text content extracted from the page.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/browse</code>
+                            <p>Browse complete DOM structure with all available XPaths for targeted extraction.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/filter/tag/{tagname}</code>
+                            <p>Filter elements by HTML tag name (div, p, span, table, etc.).</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="method">GET</div> <code>/api/{slug}/filter/xpath?xpath={path}</code>
+                            <p>Get specific elements by their exact XPath location in the DOM tree.</p>
+                        </div>
+                        
+                        <h2>💡 Pro Tips</h2>
+                        <ul>
+                            <li>Use the <strong>Browse Structure</strong> button to explore available XPaths</li>
+                            <li>XPaths are automatically generated in the format <code>/tag[position]</code></li>
+                            <li>All URLs in links and images are converted to absolute URLs</li>
+                            <li>API responses are cached for 5 minutes for better performance</li>
+                            <li>Each generated API slug expires after 30 days</li>
+                        </ul>
+                        
+                        <h2>🔧 Response Format</h2>
+                        <p>All endpoints return JSON with consistent structure:</p>
+                        <pre>{
+  "meta": { "url", "title", "description" },
+  "index": { "by_tag", "by_xpath", "links", "images", etc. },
+  "stats": { "total_elements", "links_count", etc. }
+}</pre>
+                    </body>
+                </html>
+            `);
+        }
+
+        function showExamples() {
+            const exampleWindow = window.open('', '_blank');
+            exampleWindow.document.write(`
+                <html>
+                    <head>
+                        <title>ScrapeToAPI - Usage Examples</title>
+                        <style>
+                            body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px; max-width: 900px; margin: 0 auto; }
+                            h1 { color: #333; border-bottom: 3px solid #28a745; padding-bottom: 10px; }
+                            h2 { color: #28a745; margin-top: 30px; }
+                            .example { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #28a745; }
+                            pre { background: #fff; padding: 15px; border-radius: 5px; overflow-x: auto; border: 1px solid #ddd; }
+                            .use-case { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>💡 Usage Examples</h1>
+                        
+                        <h2>🚀 Real-World Use Cases</h2>
+                        
+                        <div class="use-case">
+                            <h3>📊 Data Analysis</h3>
+                            <p>Extract product listings, prices, or reviews from e-commerce sites for market research.</p>
+                        </div>
+                        
+                        <div class="use-case">
+                            <h3>📰 Content Monitoring</h3>
+                            <p>Track changes in news articles, blog posts, or website content over time.</p>
+                        </div>
+                        
+                        <div class="use-case">
+                            <h3>🔗 Link Analysis</h3>
+                            <p>Analyze website structure, find broken links, or map site architecture.</p>
+                        </div>
+                        
+                        <div class="use-case">
+                            <h3>📱 Mobile App Integration</h3>
+                            <p>Feed structured web data into mobile applications or dashboards.</p>
+                        </div>
+                        
+                        <h2>💻 Code Examples</h2>
+                        
+                        <div class="example">
+                            <h3>JavaScript - Extract All Links</h3>
+                            <pre>
+fetch('YOUR_API_URL/links')
+  .then(response => response.json())
+  .then(links => {
+    links.forEach(link => {
+      console.log(\`Link: \${link.text} -> \${link.url}\`);
+    });
+  });
+                            </pre>
+                        </div>
+                        
+                        <div class="example">
+                            <h3>Python - Get Specific Element by XPath</h3>
+                            <pre>
+import requests
+
+# First, browse to find the XPath you need
+browse_response = requests.get('YOUR_API_URL/browse')
+structure = browse_response.json()
+
+# Then get specific element
+xpath = '/body[1]/div[1]/h1[1]'  # Example XPath
+response = requests.get(f'YOUR_API_URL/filter/xpath?xpath={xpath}')
+element = response.json()
+
+if element['count'] > 0:
+    print(f"Found element: {element['elements'][0]['text']}")
+                            </pre>
+                        </div>
+                        
+                        <div class="example">
+                            <h3>Node.js - Monitor Page Changes</h3>
+                            <pre>
+const axios = require('axios');
+
+async function checkPageChanges(apiUrl) {
+  try {
+    const response = await axios.get(\`\${apiUrl}/headings\`);
+    const headings = response.data;
+    
+    // Store headings and compare with previous version
+    const currentHeadings = headings.map(h => h.text).join('|');
+    
+    // Compare with stored version (implement your storage logic)
+    if (currentHeadings !== previousHeadings) {
+      console.log('Page content has changed!');
+      // Send notification or trigger action
+    }
+  } catch (error) {
+    console.error('Error checking page:', error);
+  }
+}
+                            </pre>
+                        </div>
+                        
+                        <div class="example">
+                            <h3>Python - Bulk Data Extraction</h3>
+                            <pre>
+import requests
+import pandas as pd
+
+# Get all tables from a page
+response = requests.get('YOUR_API_URL/filter/tag/table')
+tables = response.json()
+
+# Get all paragraphs
+response = requests.get('YOUR_API_URL/filter/tag/p')
+paragraphs = response.json()
+
+# Create a DataFrame for analysis
+data = []
+for p in paragraphs['elements']:
+    data.append({
+        'text': p['text'][:100],  # First 100 chars
+        'xpath': p['xpath'],
+        'word_count': len(p['text'].split())
+    })
+
+df = pd.DataFrame(data)
+print(df.describe())
+                            </pre>
+                        </div>
+                    </body>
+                </html>
+            `);
+        }
+
+        function showLimitations() {
+            const limitWindow = window.open('', '_blank');
+            limitWindow.document.write(`
+                <html>
+                    <head>
+                        <title>ScrapeToAPI - Limitations & Ethics</title>
+                        <style>
+                            body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+                            h1 { color: #333; border-bottom: 3px solid #dc3545; padding-bottom: 10px; }
+                            h2 { color: #dc3545; margin-top: 30px; }
+                            .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                            .limitation { background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                            .good-practice { background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin: 15px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>⚠️ Limitations & Ethical Guidelines</h1>
+                        
+                        <h2>🚫 Technical Limitations</h2>
+                        
+                        <div class="limitation">
+                            <h3>JavaScript-Heavy Sites</h3>
+                            <p>Currently optimized for static content. Some dynamic content loaded by JavaScript may not be captured.</p>
+                        </div>
+                        
+                        <div class="limitation">
+                            <h3>Rate Limiting</h3>
+                            <p>Limited to 10 requests per minute per IP to prevent abuse and ensure fair usage.</p>
+                        </div>
+                        
+                        <div class="limitation">
+                            <h3>Page Size Limits</h3>
+                            <p>Pages larger than 10MB may timeout or return incomplete data.</p>
+                        </div>
+                        
+                        <div class="limitation">
+                            <h3>Anti-Bot Protection</h3>
+                            <p>Sites with CAPTCHA, login requirements, or anti-bot measures cannot be scraped.</p>
+                        </div>
+                        
+                        <h2>⚖️ Legal & Ethical Considerations</h2>
+                        
+                        <div class="warning">
+                            <h3>🤖 Respect robots.txt</h3>
+                            <p>Always check and respect a website's robots.txt file. Our service attempts to check this automatically, but you should verify compliance.</p>
+                        </div>
+                        
+                        <div class="warning">
+                            <h3>📜 Terms of Service</h3>
+                            <p>Review the website's Terms of Service before scraping. Some sites explicitly prohibit automated data collection.</p>
+                        </div>
+                        
+                        <div class="warning">
+                            <h3>🔒 Privacy & Copyright</h3>
+                            <p>Don't scrape personal information, copyrighted content, or private data. Only collect publicly available information.</p>
+                        </div>
+                        
+                        <div class="warning">
+                            <h3>🌊 Be Respectful</h3>
+                            <p>Don't overload servers with excessive requests. Use reasonable delays between requests.</p>
+                        </div>
+                        
+                        <h2>✅ Best Practices</h2>
+                        
+                        <div class="good-practice">
+                            <h3>🎯 Purpose-Driven Scraping</h3>
+                            <p>Only scrape data that you actually need for legitimate purposes like research, analysis, or personal projects.</p>
+                        </div>
+                        
+                        <div class="good-practice">
+                            <h3>🔄 Cache & Reuse</h3>
+                            <p>Our service caches results for 5 minutes. Reuse cached data instead of re-scraping immediately.</p>
+                        </div>
+                        
+                        <div class="good-practice">
+                            <h3>📞 Contact Website Owners</h3>
+                            <p>For large-scale scraping projects, consider contacting the website owner to request permission or access to their API.</p>
+                        </div>
+                        
+                        <div class="good-practice">
+                            <h3>🛡️ Attribution</h3>
+                            <p>When using scraped data, provide proper attribution to the original source.</p>
+                        </div>
+                        
+                        <h2>🚨 Prohibited Uses</h2>
+                        <ul>
+                            <li>Scraping personal information or private data</li>
+                            <li>Bypassing paywalls or authentication</li>
+                            <li>Competitive intelligence gathering without permission</li>
+                            <li>Overloading servers with excessive requests</li>
+                            <li>Scraping content for spam or malicious purposes</li>
+                        </ul>
+                        
+                        <p><strong>Remember:</strong> With great power comes great responsibility. Use this tool ethically and respectfully!</p>
+                    </body>
+                </html>
+            `);
+        }
+
+        function loadSampleUrl(url) {
+            document.getElementById('urlInput').value = url;
+            // Optionally trigger the form submission
+            // document.getElementById('scrapeForm').dispatchEvent(new Event('submit'));
+        }
+
+        function clearAll() {
+            if (confirm('This will clear the current results and reset the form. Continue?')) {
+                reset();
+                // Additional cleanup if needed
+                currentApiUrl = '';
+                console.log('All data cleared');
+            }
+        }
+
+        // Add some debug info on page load
+        console.log('ScrapeToAPI page loaded');
+        console.log('Form element:', form);
+    </script>
+</body>
+</html>

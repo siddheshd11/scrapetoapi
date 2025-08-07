@@ -1,0 +1,385 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+}
+
+p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.scrape-form {
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="url"] {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input[type="url"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+button {
+    padding: 15px 25px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background: #5a67d8;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.result {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+}
+
+.result h3 {
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.api-info label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.api-endpoint {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.api-endpoint input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.copy-btn {
+    padding: 10px 15px;
+    background: #28a745;
+    font-size: 14px;
+}
+
+.copy-btn:hover {
+    background: #218838;
+}
+
+.api-usage {
+    margin-bottom: 25px;
+}
+
+.api-usage h4 {
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #e1e5e9;
+    padding-bottom: 10px;
+}
+
+.usage-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #667eea;
+}
+
+.usage-section h5 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.usage-section p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+    text-align: left;
+}
+
+.code-block {
+    position: relative;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.code-block code {
+    color: #495057;
+}
+
+.copy-code-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 4px 8px;
+    font-size: 11px;
+    background: #6c757d;
+    border-radius: 3px;
+}
+
+.copy-code-btn:hover {
+    background: #5a6268;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.test-btn {
+    background: #17a2b8;
+}
+
+.test-btn:hover {
+    background: #138496;
+}
+
+.reset-btn {
+    background: #6c757d;
+}
+
+.reset-btn:hover {
+    background: #5a6268;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    margin-top: 20px;
+}
+
+.info-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: #e3f2fd;
+    border-radius: 8px;
+    border-left: 4px solid #2196f3;
+}
+
+.info-section h4 {
+    margin-bottom: 15px;
+    color: #1976d2;
+}
+
+.info-section ul {
+    list-style-position: inside;
+    color: #333;
+}
+
+.info-section li {
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .input-group {
+        flex-direction: column;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .api-endpoint {
+        flex-direction: column;
+    }
+}
+
+
+/* Add this to your existing CSS */
+
+.footer {
+    margin-top: 50px;
+    padding: 5px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border-top: 3px solid #007bff;
+}
+
+.footer-content {
+  display: flex;
+  justify-content:space-between; /* distribute columns evenly */
+  align-items: stretch;           /* same height columns */
+  gap: 10px;                      /* spacing between columns */
+  padding: 20px;                  /* padding around */
+  max-width: 1200px;              /* optional: constrains width */
+  margin: 0 auto 30px;            /* centers container on page */
+}
+
+.footer-section{
+    width: 30%;
+}
+
+
+.footer-section h4 {
+    color: #007bff;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.footer-section h5 {
+    color: #333;
+    margin-bottom: 12px;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.footer-section p {
+    color: #666;
+    line-height: 1.6;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-section li {
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.footer-section a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.footer-section a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+    color: #6c757d;
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.footer-note {
+    display: block;
+    font-style: italic;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #28a745;
+}
+
+/* Responsive footer */
+@media (max-width: 768px) {
+    .footer {
+        margin-top: 30px;
+        padding: 30px 0 15px;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .footer-section {
+        text-align: center;
+    }
+    
+    .footer-section ul {
+        text-align: center;
+    }
+    
+    .footer-note {
+        font-size: 11px;
+    }
+}
