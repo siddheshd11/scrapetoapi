@@ -2,17 +2,21 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy requirements first for better caching
-COPY req.txt .
+# Copy requirements first
+COPY requirements.txt .
 
-# Install Python dependencies without system packages
-RUN pip install --no-cache-dir -r req.txt
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy all application files
 COPY . .
 
-# Expose port
-EXPOSE 8000
+# And verify the structure:
+RUN ls -la app/templates/
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+# Use Railway's dynamic port
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

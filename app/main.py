@@ -592,6 +592,25 @@ async def get_text_content(slug: str):
         raise HTTPException(status_code=404, detail="Data not found")
     return scraped_data[slug]['index']['text_content']
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# Add this near the top of your endpoints, before other routes
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for deployment platforms"""
+    return {
+        "status": "healthy", 
+        "service": "ScrapeToAPI",
+        "timestamp": time.time()
+    }
+
+# @app.get("/")
+# async def root():
+#     """Root endpoint that Railway health check can access"""
+#     return {
+#         "message": "ScrapeToAPI is running!", 
+#         "status": "healthy",
+#         "docs_url": "/docs" if os.getenv("DEBUG") else "Docs disabled in production"
+#     }
+
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
