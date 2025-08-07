@@ -9,6 +9,11 @@ from typing import Dict, Any, List, Optional
 from urllib.parse import urljoin, urlparse
 import time
 
+import logging
+import os
+
+
+
 app = FastAPI(title="ScrapeToAPI")
 
 # Setup templates and static files
@@ -19,6 +24,27 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 scraped_data = {}
 scrape_cache = {}
 CACHE_DURATION = 7200
+
+# Add at the top of your file
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("🚀 ScrapeToAPI is starting up!")
+    logger.info(f"Port: {os.getenv('PORT', '8000')}")
+    logger.info(f"Templates directory exists: {os.path.exists('app/templates')}")
+    logger.info(f"Static directory exists: {os.path.exists('app/static')}")
+
+@app.get("/debug")
+async def debug_info():
+    return {
+        "port": os.getenv('PORT', 'Not set'),
+        "templates_exist": os.path.exists('app/templates'),
+        "static_exist": os.path.exists('app/static'),
+        "working_directory": os.getcwd(),
+        "files": os.listdir('.')
+    }
 
 
 def get_cache_key(url: str) -> str:
@@ -401,7 +427,17 @@ async def test_xpath(slug: str, test_xpath: str):
     }
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
+async def root():
+    """Root endpoint that Railway health check can access"""
+    return {
+        "message": "ScrapeToAPI is running!", 
+        "status": "healthy",
+        "docs_url": "/docs" if os.getenv("DEBUG") else "Docs disabled in production"
+    }
+
+# Make sure your home page route comes after the root API endpoint
+@app.get("/app", response_class=HTMLResponse)
 async def home(request: Request):
     """Serve the main page with URL input form"""
     return templates.TemplateResponse("index.html", {"request": request})
